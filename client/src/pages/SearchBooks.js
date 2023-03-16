@@ -9,7 +9,9 @@ import {
 } from 'react-bootstrap';
 
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
+import { useMutation } from '@apollo/client';
+import { SAVE_BOOK } from '../utils/mutations'
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
@@ -70,9 +72,11 @@ const SearchBooks = () => {
     if (!token) {
       return false;
     }
-
+    // TODO: Use the Apollo useMutation() Hook to execute the SAVE_BOOK mutation 
+    // in the handleSaveBook() function instead of the saveBook() function 
+    // imported from the API file.
     try {
-      const response = await saveBook(bookToSave, token);
+      const response = await useMutation(bookToSave, token);
 
       if (!response.ok) {
         throw new Error('something went wrong!');
