@@ -4,38 +4,34 @@ import { Form, Button, Alert } from 'react-bootstrap';
 // TODO: Replace the loginUser() functionality imported 
 // from the API file with the LOGIN_USER mutation functionality.
 import { LOGIN_USER } from '../utils/mutations';
+import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
-  const [validated] = useState(false);
+  const [login, { error, data }] = useMutation(LOGIN_USER);
   const [showAlert, setShowAlert] = useState(false);
 
+  // update based on form input changes
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    setUserFormData({ ...userFormData, [name]: value });
+    setUserFormData({
+      ...userFormData,
+      [name]: value
+    });
   };
 
+  // submit the form
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
+    console.log(userFormData);
     // check if form has everything (as per react-bootstrap docs)
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-
     try {
-      const response = await loginUser(userFormData);
+      const { data } = await login({
+        variables: { ...userFormData },
+      });
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const { token, user } = await response.json();
-      console.log(user);
-      Auth.login(token);
+      Auth.login(data.login.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
@@ -50,7 +46,7 @@ const LoginForm = () => {
 
   return (
     <>
-      <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
+      <Form onSubmit={handleFormSubmit}>
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your login credentials!
         </Alert>

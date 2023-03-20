@@ -76,7 +76,7 @@ const SearchBooks = () => {
     // in the handleSaveBook() function instead of the saveBook() function 
     // imported from the API file.
     try {
-      const response = await useMutation(bookToSave, token);
+      const response = await saveBook(bookToSave, token);
 
       if (!response.ok) {
         throw new Error('something went wrong!');
@@ -95,7 +95,7 @@ const SearchBooks = () => {
         <Container>
           <h1>Search for Books!</h1>
           <Form onSubmit={handleFormSubmit}>
-            <Form.Row>
+            <Form>
               <Col xs={12} md={8}>
                 <Form.Control
                   name='searchInput'
@@ -111,7 +111,7 @@ const SearchBooks = () => {
                   Submit Search
                 </Button>
               </Col>
-            </Form.Row>
+            </Form>
           </Form>
         </Container>
       </div>
