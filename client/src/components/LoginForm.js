@@ -9,12 +9,15 @@ import Auth from '../utils/auth';
 
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
-  const [login, { error, data }] = useMutation(LOGIN_USER);
+  const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [login, { error, data }] = useMutation(LOGIN_USER);
+  
 
   // update based on form input changes
   const handleInputChange = (event) => {
     const { name, value } = event.target;
+
     setUserFormData({
       ...userFormData,
       [name]: value
@@ -36,7 +39,7 @@ const LoginForm = () => {
       console.error(err);
       setShowAlert(true);
     }
-
+    // clear form values
     setUserFormData({
       username: '',
       email: '',
@@ -46,7 +49,7 @@ const LoginForm = () => {
 
   return (
     <>
-      <Form onSubmit={handleFormSubmit}>
+      <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
         <Alert dismissible onClose={() => setShowAlert(false)} show={showAlert} variant='danger'>
           Something went wrong with your login credentials!
         </Alert>
