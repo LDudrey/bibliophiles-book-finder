@@ -36,7 +36,7 @@ const resolvers = {
         saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
             const updatedUser = await User.findOneAndUpdate(
                 { _id: context.user._id  },
-                { $addToSet: { bookId, authors, description, title, image, link  } },
+                { $addToSet: {savedBooks: {bookId, authors, description, title, image, link}  } },
                 { new: true, runValidators: true }
             );
             return updatedUser;

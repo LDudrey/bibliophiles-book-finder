@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
   Card,
@@ -6,10 +6,11 @@ import {
   Row,
   Col
 } from 'react-bootstrap';
-import { useQuery, useMutation } from '@apollo/client';
-import { REMOVE_BOOK } from '../utils/mutations'
-import { GET_ME } from '../utils/queries'
+
 import Auth from '../utils/auth';
+import { useQuery, useMutation } from '@apollo/client';
+import { REMOVE_BOOK } from '../utils/mutations';
+import { GET_ME } from '../utils/queries';
 import { removeBookId } from '../utils/localStorage';
 // TODO: 
 // 1. Remove the useEffect() Hook that sets the state for UserData.
@@ -18,42 +19,53 @@ import { removeBookId } from '../utils/localStorage';
 // 3. Use the useMutation() Hook to execute the REMOVE_BOOK mutation in the handleDeleteBook() 
 // function instead of the deleteBook() function that's imported from API file. 
 // (Make sure you keep the removeBookId() function in place!)
-const SavedBooks = ({ bookId, isLoggedInUser = false }) => {
-  const [removeBookId, { error }] = useMutation(REMOVE_BOOK, {
-    update(cache, { data: { removeBook } }) {
-      try {
-        cache.writeQuery({
-          query: GET_ME,
-          data: { me: removeBook },
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    },
-  });
+const SavedBooks = () => {
+  const { loading , data } = useQuery(GET_ME);
+
+  // use this to determine if `useEffect()` hook needs to run again
+  const userData = data?.me || {};
+
+  // const getUserData = async () => {
+  //     try {
+  //       const token = Auth.loggedIn() ? Auth.getToken() : null;
+
+  //       if (!token) {
+  //         return false;
+  //       }
+
+  //       const response = await getMe(token);
+
+  //       if (!response.ok) {
+  //         throw new Error('something went wrong!');
+  //       }
+
+  //       const user = await response.json();
+  //       setUserData(user);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+
+    if (loading) {
+      return <h1>Loading...</h1>;
+    }
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
   const handleDeleteBook = async (bookId) => {
+    const token = Auth.loggedIn() ? Auth.getToken() : null;
+
+    if (!token) {
+      return false;
+    }
+
     try {
       const { data } = await removeBookId({
-        variables: { bookId },
+        variables: { bookId, token},
       });
     } catch (err) {
       console.error(err);
     }
   };
-
-if (!bookId.length) {
-  return <h3>No Books saved yet</h3>;
-}
-
-
-
-
-// if data isn't here yet, say so
-if (!userDataLength) {
-  return <h2>LOADING...</h2>;
-}
 
 return (
   <>

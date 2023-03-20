@@ -10,8 +10,7 @@ import {
 
 import Auth from '../utils/auth';
 import { useMutation } from '@apollo/client';
-import { SAVE_BOOK } from '../utils/mutations'
-import { searchGoogleBooks } from '../utils/API';
+import { SAVE_BOOK } from '../utils/mutations';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
@@ -20,7 +19,7 @@ const SearchBooks = () => {
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
   // setting up useMutation hook to modify user data
-  const [saveBook, { error, data }] = useMutation(SAVE_BOOK);
+  const [saveBook, { error }] = useMutation(SAVE_BOOK);
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
@@ -39,7 +38,7 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await searchGoogleBooks(searchInput);
+      const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchInput}`);
 
       if (!response.ok) {
         throw new Error('something went wrong!');
@@ -77,8 +76,8 @@ const SearchBooks = () => {
     // in the handleSaveBook() function instead of the saveBook() function 
     // imported from the API file.
     try {
-      const response = await saveBook({
-        variables: { bookData: bookToSave},
+      const { data } = await saveBook({
+        variables: { bookData: { ...bookToSave } },
       });
 
       // if book successfully saves to user's account, save book id to state
@@ -94,7 +93,6 @@ const SearchBooks = () => {
         <Container>
           <h1>Search for Books!</h1>
           <Form onSubmit={handleFormSubmit}>
-            
               <Col xs={12} md={8}>
                 <Form.Control
                   name='searchInput'
@@ -110,7 +108,6 @@ const SearchBooks = () => {
                   Submit Search
                 </Button>
               </Col>
-            
           </Form>
         </Container>
       </div>
