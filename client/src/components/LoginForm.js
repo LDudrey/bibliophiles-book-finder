@@ -12,7 +12,7 @@ const LoginForm = () => {
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [login, { error, data }] = useMutation(LOGIN_USER);
-  
+
 
   // update based on form input changes
   const handleInputChange = (event) => {
@@ -28,12 +28,18 @@ const LoginForm = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     console.log(userFormData);
+
     // check if form has everything (as per react-bootstrap docs)
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
     try {
       const { data } = await login({
         variables: { ...userFormData },
       });
-
       Auth.login(data.login.token);
     } catch (err) {
       console.error(err);
