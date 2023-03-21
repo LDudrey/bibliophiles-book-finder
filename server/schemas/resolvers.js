@@ -33,19 +33,20 @@ const resolvers = {
 
             return { token, user };
         },
-        saveBook: async (parent, { bookId, authors, description, title, image, link }, context) => {
+        saveBook: async (parent, { input }, context) => {
             const updatedUser = await User.findOneAndUpdate(
                 { _id: context.user._id  },
-                { $addToSet: {savedBooks: {bookId, authors, description, title, image, link}  } },
+                { $addToSet: {savedBooks: input } },
                 { new: true, runValidators: true }
             );
             return updatedUser;
         },
-        deleteBook: async (parent, { bookId }, context) => {
+        removeBook: async (parent, { bookId }, context) => {
+            console.log(bookId);
             const updatedUser = await User.findOneAndUpdate(
                 { _id: context.user._id },
-                { $pull: { savedBooks: { bookId } } },
-                { new: true }
+                { $pull: { savedBooks: { bookId }  } },
+                { new: true, runValidators: true }
             );
             if (!updatedUser) {
                 throw new AuthenticationError('No user with this id');
