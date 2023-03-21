@@ -8,7 +8,6 @@ const resolvers = {
             if (context.user) {
                 return User.findOne({ _id: context.user._id }).populate('books');
             }
-            console.log(context)
             throw new AuthenticationError('You need to be logged in!');
         },
     },
@@ -42,7 +41,6 @@ const resolvers = {
             return updatedUser;
         },
         removeBook: async (parent, { bookId }, context) => {
-            console.log(bookId);
             const updatedUser = await User.findOneAndUpdate(
                 { _id: context.user._id },
                 { $pull: { savedBooks: { bookId }  } },
